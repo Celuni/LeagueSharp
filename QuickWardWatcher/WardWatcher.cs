@@ -48,8 +48,6 @@ namespace QuickWardWatcher
         {
             Parallel.ForEach(ObjectManager.Get<LeagueSharp.Obj_AI_Base>(), obj =>
             {
-
-
                 if (obj.IsEnemy)
                 {
                 

@@ -22,7 +22,7 @@ namespace QuickWardWatcher
         {
             foreach(Ward ward in this)
             {
-                if (Game.Time <= ward.AliveTo) // The set may contain wards that 
+                if (Game.Time <= ward.AliveTo) // The set may contain wards that are dead
                 {
                     ward.Draw();
                 }
