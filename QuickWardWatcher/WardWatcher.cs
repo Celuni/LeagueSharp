@@ -46,15 +46,6 @@ namespace QuickWardWatcher
 
         private void SearchForNewWards()
         {
-
-            //foreach (Obj_AI_Base obj in ObjectManager.Get<Obj_AI_Base>())
-            //{
-            //    if (obj.Name.ToLower().Contains("ward"))
-            //    {
-            //        Console.WriteLine(obj.Name);
-            //    }
-            //}
-
             Parallel.ForEach(ObjectManager.Get<LeagueSharp.Obj_AI_Base>(), obj =>
             {
 
