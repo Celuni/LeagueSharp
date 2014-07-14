@@ -15,7 +15,7 @@ namespace QuickWardWatcher
         public const string GREEN_WARD_NAME = "SightWard";
         public const float GREEN_WARD_LENGTH = 180.0f;
         public const string PINK_WARD_NAME = "VisionWard";
-        public const float PINK_WARD_LENGTH = 180.0f;
+        public const float PINK_WARD_LENGTH = float.MaxValue;
         public const string TRINKET_WARD_NAME = "YellowTrinket";
         public const float TRINKET_WARD_LENGTH = 60.0f;
 
@@ -40,7 +40,7 @@ namespace QuickWardWatcher
                 DrawColor = System.Drawing.Color.Green;
             } else if(skinName == PINK_WARD_NAME)
             {
-                AliveTo = float.MaxValue; // Pinks may last forever.
+                AliveTo = PINK_WARD_LENGTH; // Pinks may last forever.
                 DrawColor = System.Drawing.Color.DeepPink;
             }
             else if (skinName == TRINKET_WARD_NAME)
@@ -75,7 +75,9 @@ namespace QuickWardWatcher
 
         public bool CheckRemove() {
 
-            if (AliveTo == float.MaxValue && ObjectManager.GetUnitByNetworkId<Obj_AI_Base>(NetworkId).IsDead)
+            if (AliveTo == float.MaxValue &&
+                ObjectManager.GetUnitByNetworkId<Obj_AI_Base>(NetworkId) != null &&
+                ObjectManager.GetUnitByNetworkId<Obj_AI_Base>(NetworkId).IsDead)
             {
                 AliveTo = Game.Time - 1.0f;
             }

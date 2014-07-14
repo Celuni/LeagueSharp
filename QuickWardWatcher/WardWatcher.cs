@@ -20,7 +20,6 @@ namespace QuickWardWatcher
             Game.OnGameStart += OnGameStart;
             Game.OnGameUpdate += OnGameUpdate;
             Drawing.OnDraw += OnDraw;
-            
         }
 
         private void OnGameStart(EventArgs args)
