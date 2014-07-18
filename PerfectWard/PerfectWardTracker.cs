@@ -9,30 +9,44 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 namespace PerfectWard
 {
-    class PerfectWardTracker
+    internal class PerfectWardTracker
     {
-        private const int VK_M = 77;
-        const int WM_KEYDOWN = 0x0100, WM_KEYUP = 0x0101, WM_CHAR = 0x0102, WM_SYSKEYDOWN = 0x0104, WM_SYSKEYUP = 0x0105;
+        private const int VK_LBUTTON = 1;
+        private const int WM_KEYDOWN = 0x0100, WM_KEYUP = 0x0101, WM_CHAR = 0x0102, WM_SYSKEYDOWN = 0x0104, WM_SYSKEYUP = 0x0105, WM_MOUSEDOWN = 0x201;
+        private WardSpot _PutSafeWard;
 
         public PerfectWardTracker()
         {
             Game.OnGameStart += OnGameStart;
             Game.OnWndProc += OnWndProc;
-            Drawing.OnDraw += OnDraw;
+            Game.OnGameUpdate += Game_OnGameUpdate;
+            Drawing.OnDraw += OnDraw; 
         }
 
-        void OnKeyDown(object sender, KeyEventArgs e)
+        void Game_OnGameUpdate(EventArgs args)
         {
- 	        Console.Out.WriteLine("Captured M press!!!");
-        }
-
-        unsafe void OnWndProc(WndEventArgs args)
-        {
-            if (args.Msg == WM_KEYDOWN)
+            if (_PutSafeWard != null)
             {
-                if (args.WParam == VK_M)
+                if (Math.Sqrt(Math.Pow(_PutSafeWard.ClickPosition.X - ObjectManager.Player.Position.X, 2) + Math.Pow(_PutSafeWard.ClickPosition.Y - ObjectManager.Player.Position.Y, 2)) <= 650.0)
                 {
-                    Vector3? nearestWard = Ward.FindNearestWardSpot(ObjectManager.Player.Position);
+                    SpellSlot wardSpellSlot = Ward.FindWardSpellSlot(ObjectManager.Player);
+
+                    if (wardSpellSlot != SpellSlot.Unknown)
+                    {
+                        ObjectManager.Player.Spellbook.CastSpell(wardSpellSlot, (Vector3)_PutSafeWard.ClickPosition);
+                    }
+                    _PutSafeWard = null;
+                }
+            }
+        }
+
+        public void OnWndProc(WndEventArgs args)
+        {
+            if (args.Msg == WM_MOUSEDOWN)
+            {
+                if (args.WParam == VK_LBUTTON)
+                {
+                    Vector3? nearestWard = Ward.FindNearestWardSpot(Drawing.ScreenToWorld(Game.CursorPos.X, Game.CursorPos.Y));
 
                     if (nearestWard != null)
                     {
@@ -42,6 +56,19 @@ namespace PerfectWard
                          {
                              ObjectManager.Player.Spellbook.CastSpell(wardSpellSlot, (Vector3)nearestWard);
                          } 
+                    }
+
+                    WardSpot nearestSafeWard = Ward.FindNearestSafeWardSpot(Drawing.ScreenToWorld(Game.CursorPos.X, Game.CursorPos.Y));
+
+                    if (nearestSafeWard != null)
+                    {
+                        SpellSlot wardSpellSlot = Ward.FindWardSpellSlot(ObjectManager.Player);
+
+                        if (wardSpellSlot != SpellSlot.Unknown)
+                        {
+                            ObjectManager.Player.IssueOrder(GameObjectOrder.MoveTo, nearestSafeWard.MagneticPosition);
+                            _PutSafeWard = nearestSafeWard;
+                        }
                     }
                 }
             }
@@ -61,6 +88,7 @@ namespace PerfectWard
         private void OnDraw(EventArgs args)
         {
             Ward.DrawWardSpots();
+            Ward.DrawSafeWardSpots();
         }
     }
 }
